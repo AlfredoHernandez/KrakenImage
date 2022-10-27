@@ -121,7 +121,18 @@ final class KrakenImageViewControllerTests: XCTestCase {
         
         viewController.krakenImageViewController.load()
         
-        assertSnapshot(matching: viewController, as: .image(on: .iPhone13Pro), record: false)
+        assertSnapshot(matching: viewController, as: .image(on: .iPhone13Pro))
+    }
+    
+    func test_state_displaysRetryComponent_onFailedLoadedImage() {
+        let (sut, loader) = makeSUT()
+        let viewController = TestKrakenImageViewController()
+        viewController.krakenImageViewController = sut
+        
+        viewController.krakenImageViewController.load()
+        loader.complete(with: anyNSError())
+        
+        assertSnapshot(matching: viewController, as: .image(on: .iPhone13Pro))
     }
 
     // MARK: - Helpers
@@ -153,5 +164,11 @@ final class KrakenImageViewControllerTests: XCTestCase {
                 krakenImageViewController.imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             ])
         }
+    }
+}
+
+extension KrakenImageViewController {
+    var retryIndicator: UIView? {
+        self.imageView.retryIndicator
     }
 }
