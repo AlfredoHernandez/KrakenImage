@@ -28,6 +28,27 @@ final class KrakenImageViewTests: XCTestCase {
         XCTAssertEqual(loader.loadedURLs, [anyURL()])
     }
 
+    func test_load_displaysDefaultLoaderWhileDownloadingImage() {
+        let (sut, loader) = makeSUT()
+        XCTAssertFalse(sut.loadingControl.isRefreshing)
+        
+        sut.load()
+        XCTAssertTrue(sut.loadingControl.isRefreshing, "Expected to display loader while loading image")
+        XCTAssertTrue(sut.isLoading, "Expected to display loader while loading image")
+        
+        loader.complete(with: anyNSError())
+        XCTAssertFalse(sut.loadingControl.isRefreshing, "Expected to not display loader after finish loading")
+        XCTAssertFalse(sut.isLoading, "Expected to display loader while loading image")
+
+        sut.load()
+        XCTAssertTrue(sut.loadingControl.isRefreshing, "Expected to display loader while loading image")
+        XCTAssertTrue(sut.isLoading, "Expected to display loader while loading image")
+
+        loader.complete(with: anyData())
+        XCTAssertFalse(sut.loadingControl.isRefreshing, "Expected to not display loader after finish loading")
+        XCTAssertFalse(sut.isLoading, "Expected to display loader while loading image")
+    }
+
     // MARK: - Helpers
 
     private func makeSUT(url: URL? = anyURL(), file: StaticString = #file, line: UInt = #line) -> (KrakenImageView, KrakenImageDataLoaderSpy) {
