@@ -12,6 +12,10 @@ func anyURL() -> URL {
     return URL(string: "http://any-url.com")!
 }
 
+func invalidURL() -> URL? {
+    return URL(string: "invalid url")
+}
+
 func anyData() -> Data {
     return Data("any data".utf8)
 }

@@ -13,11 +13,15 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/AlfredoHernandez/KrakenNetwork.git", branch: "main"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.10.0"),
     ],
     targets: [
         .target(name: "KrakenImage", dependencies: [
             .product(name: "KrakenNetwork", package: "KrakenNetwork"),
         ]),
-        .testTarget(name: "KrakenImageTests", dependencies: ["KrakenImage"]),
+        .testTarget(name: "KrakenImageTests", dependencies: [
+            "KrakenImage",
+            .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
+        ]),
     ]
 )

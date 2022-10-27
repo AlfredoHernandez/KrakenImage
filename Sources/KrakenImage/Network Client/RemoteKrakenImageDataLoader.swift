@@ -5,10 +5,10 @@
 import Foundation
 import KrakenNetwork
 
-public final class RemoteKrakenImageDataLoader: KrakenImageDataLoader {
+internal final class RemoteKrakenImageDataLoader: KrakenImageDataLoader {
     private let client: HTTPClient
 
-    public init(client: HTTPClient) {
+    internal init(client: HTTPClient) {
         self.client = client
     }
 
@@ -40,7 +40,7 @@ public final class RemoteKrakenImageDataLoader: KrakenImageDataLoader {
         }
     }
 
-    public func loadImageData(from url: URL, completion: @escaping (KrakenImageDataLoader.Result) -> Void) -> KrakenImageDataLoaderTask {
+    internal func loadImageData(from url: URL, completion: @escaping (KrakenImageDataLoader.Result) -> Void) -> KrakenImageDataLoaderTask {
         let task = HTTPClientTaskWrapper(completion)
         task.wrapped = client.get(from: url) { [weak self] result in
             guard self != nil else { return }
