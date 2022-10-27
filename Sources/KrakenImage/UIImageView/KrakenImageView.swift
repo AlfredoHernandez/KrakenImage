@@ -7,6 +7,8 @@ import UIKit
 public class KrakenImageView {
     private let loader: KrakenImageDataLoader
     private let url: URL?
+    private var task: KrakenImageDataLoaderTask?
+
     private(set) var isLoading: Bool = false {
         willSet {
             newValue ? loadingControl.beginRefreshing() : loadingControl.endRefreshing()
@@ -21,9 +23,9 @@ public class KrakenImageView {
         button.isHidden = true
         return button
     }
-    
+
     private(set) lazy var imageView: UIImageView = with(UIImageView()) { iv in
-        return iv
+        iv
     }
 
     init(loader: KrakenImageDataLoader, url: URL?) {
@@ -31,11 +33,12 @@ public class KrakenImageView {
         self.url = url
     }
 
+    /// Start loading image task
     func load() {
         guard let url = url else { return }
         isLoading = true
         retryIndicator?.isHidden = true
-        loader.loadImageData(from: url) { [weak self] result in
+        task = loader.loadImageData(from: url) { [weak self] result in
             switch result {
             case let .success(imageData):
                 self?.imageView.image = UIImage(data: imageData)
@@ -45,5 +48,10 @@ public class KrakenImageView {
 
             self?.isLoading = false
         }
+    }
+
+    /// Cancels the current loading image task
+    func cancel() {
+        task?.cancel()
     }
 }

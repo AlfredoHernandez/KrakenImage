@@ -74,7 +74,7 @@ final class KrakenImageViewTests: XCTestCase {
         sut.load()
         XCTAssertEqual(sut.retryIndicator?.isHidden, true)
     }
-    
+
     func test_load_setsUIImageOnValidImageData() {
         let (sut, loader) = makeSUT()
         let expectedImageData = UIImage.make(withColor: .red).pngData()!
@@ -94,7 +94,16 @@ final class KrakenImageViewTests: XCTestCase {
         loader.complete(with: expectedImageData)
         XCTAssertNil(sut.imageView.image?.pngData())
     }
-    
+
+    func test_cancel_cancelsRequestedLoadingImage() {
+        let (sut, loader) = makeSUT()
+        sut.load()
+
+        sut.cancel()
+
+        XCTAssertEqual(loader.cancelledURLs, [anyURL()])
+    }
+
     // MARK: - Helpers
 
     private func makeSUT(url: URL? = anyURL(), file: StaticString = #file, line: UInt = #line) -> (KrakenImageView, KrakenImageDataLoaderSpy) {
@@ -105,35 +114,5 @@ final class KrakenImageViewTests: XCTestCase {
         trackForMemoryLeaks(loader, file: file, line: line)
 
         return (sut, loader)
-    }
-}
-
-class KrakenImageDataLoaderSpy: KrakenImageDataLoader {
-    private var messages = [(url: URL, completion: (KrakenImageDataLoader.Result) -> Void)]()
-
-    private(set) var cancelledURLs = [URL]()
-
-    var loadedURLs: [URL] {
-        return messages.map { $0.url }
-    }
-
-    private struct Task: KrakenImageDataLoaderTask {
-        let callback: () -> Void
-        func cancel() { callback() }
-    }
-
-    func loadImageData(from url: URL, completion: @escaping (KrakenImageDataLoader.Result) -> Void) -> KrakenImageDataLoaderTask {
-        messages.append((url, completion))
-        return Task { [weak self] in
-            self?.cancelledURLs.append(url)
-        }
-    }
-
-    func complete(with error: Error, at index: Int = 0) {
-        messages[index].completion(.failure(error))
-    }
-
-    func complete(with data: Data, at index: Int = 0) {
-        messages[index].completion(.success(data))
     }
 }
