@@ -19,7 +19,7 @@ public class KrakenImageViewController {
         }
     }
 
-    init(loader: KrakenImageDataLoader, url: URL?) {
+    init(loader: any KrakenImageDataLoader, url: URL?) {
         self.loader = loader
         self.url = url
     }

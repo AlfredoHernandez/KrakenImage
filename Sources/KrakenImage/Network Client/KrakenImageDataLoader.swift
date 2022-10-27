@@ -4,11 +4,11 @@
 
 import Foundation
 
-internal protocol KrakenImageDataLoaderTask {
+public protocol KrakenImageDataLoaderTask {
     func cancel()
 }
 
-internal protocol KrakenImageDataLoader {
+public protocol KrakenImageDataLoader {
     typealias Result = Swift.Result<Data, Error>
 
     func loadImageData(from url: URL, completion: @escaping (Result) -> Void) -> KrakenImageDataLoaderTask

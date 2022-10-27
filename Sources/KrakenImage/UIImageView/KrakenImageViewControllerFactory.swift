@@ -6,9 +6,12 @@ import KrakenNetwork
 import Foundation
 
 public class KrakenImageViewControllerFactory {
-    public static func build(url: URL?) -> KrakenImageViewController {
-        let client = URLSessionHTTPClient()
-        let imageLoader = RemoteKrakenImageDataLoader(client: client)
-        return KrakenImageViewController(loader: imageLoader, url: url)
+    public static func build(url: URL?, imageLoader: KrakenImageDataLoader? = nil) -> KrakenImageViewController {
+        guard let imageLoader = imageLoader else {
+            let client = URLSessionHTTPClient()
+            return KrakenImageViewController(loader: DispatchOnMainQueueDecoartor(RemoteKrakenImageDataLoader(client: client)), url: url)
+        }
+        let dispatchOnMainQueueLoader: KrakenImageDataLoader = DispatchOnMainQueueDecoartor(imageLoader)
+        return KrakenImageViewController(loader: dispatchOnMainQueueLoader, url: url)
     }
 }
