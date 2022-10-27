@@ -3,6 +3,7 @@
 //
 
 @testable import KrakenImage
+import SnapshotTesting
 import XCTest
 
 final class KrakenImageViewControllerTests: XCTestCase {
@@ -30,22 +31,18 @@ final class KrakenImageViewControllerTests: XCTestCase {
 
     func test_load_displaysDefaultLoaderWhileDownloadingImage() {
         let (sut, loader) = makeSUT()
-        XCTAssertFalse(sut.loadingControl.isRefreshing)
+        XCTAssertFalse(sut.isLoading)
 
         sut.load()
-        XCTAssertTrue(sut.loadingControl.isRefreshing, "Expected to display loader while loading image")
         XCTAssertTrue(sut.isLoading, "Expected to display loader while loading image")
 
         loader.complete(with: anyNSError())
-        XCTAssertFalse(sut.loadingControl.isRefreshing, "Expected to not display loader after finish loading")
         XCTAssertFalse(sut.isLoading, "Expected to display loader while loading image")
 
         sut.load()
-        XCTAssertTrue(sut.loadingControl.isRefreshing, "Expected to display loader while loading image")
         XCTAssertTrue(sut.isLoading, "Expected to display loader while loading image")
 
         loader.complete(with: anyData())
-        XCTAssertFalse(sut.loadingControl.isRefreshing, "Expected to not display loader after finish loading")
         XCTAssertFalse(sut.isLoading, "Expected to display loader while loading image")
     }
 
@@ -103,6 +100,29 @@ final class KrakenImageViewControllerTests: XCTestCase {
 
         XCTAssertEqual(loader.cancelledURLs, [anyURL()])
     }
+    
+    // UI Kit Component
+    
+    func test_state_withLoadedImage() {
+        let (sut, loader) = makeSUT()
+        let viewController = TestKrakenImageViewController()
+        viewController.krakenImageViewController = sut
+        
+        viewController.krakenImageViewController.load()
+        loader.complete(with: UIImage.make(withColor: .blue).pngData()!)
+
+        assertSnapshot(matching: viewController, as: .image(on: .iPhone13Pro))
+    }
+    
+    func test_state_withLoadingControlWhileLoadingImage() {
+        let (sut, _) = makeSUT()
+        let viewController = TestKrakenImageViewController()
+        viewController.krakenImageViewController = sut
+        
+        viewController.krakenImageViewController.load()
+        
+        assertSnapshot(matching: viewController, as: .image(on: .iPhone13Pro), record: false)
+    }
 
     // MARK: - Helpers
 
@@ -114,5 +134,24 @@ final class KrakenImageViewControllerTests: XCTestCase {
         trackForMemoryLeaks(loader, file: file, line: line)
 
         return (sut, loader)
+    }
+    
+    class TestKrakenImageViewController: UIViewController {
+        lazy var krakenImageViewController = KrakenImageViewController(
+            loader: KrakenImageDataLoaderSpy(),
+            url: anyURL()
+        )
+        
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            krakenImageViewController.imageView.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(krakenImageViewController.imageView)
+            NSLayoutConstraint.activate([
+                krakenImageViewController.imageView.widthAnchor.constraint(equalToConstant: 200),
+                krakenImageViewController.imageView.heightAnchor.constraint(equalToConstant: 200),
+                krakenImageViewController.imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                krakenImageViewController.imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            ])
+        }
     }
 }
