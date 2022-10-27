@@ -5,7 +5,7 @@
 @testable import KrakenImage
 import XCTest
 
-final class KrakenImageViewTests: XCTestCase {
+final class KrakenImageViewControllerTests: XCTestCase {
     func test_init_doesNotPerformAnyURLRequest() {
         let (_, loader) = makeSUT()
 
@@ -106,9 +106,9 @@ final class KrakenImageViewTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeSUT(url: URL? = anyURL(), file: StaticString = #file, line: UInt = #line) -> (KrakenImageView, KrakenImageDataLoaderSpy) {
+    private func makeSUT(url: URL? = anyURL(), file: StaticString = #file, line: UInt = #line) -> (KrakenImageViewController, KrakenImageDataLoaderSpy) {
         let loader = KrakenImageDataLoaderSpy()
-        let sut = KrakenImageView(loader: loader, url: url)
+        let sut = KrakenImageViewController(loader: loader, url: url)
 
         trackForMemoryLeaks(sut, file: file, line: line)
         trackForMemoryLeaks(loader, file: file, line: line)

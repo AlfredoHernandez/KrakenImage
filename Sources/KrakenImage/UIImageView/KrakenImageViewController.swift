@@ -4,7 +4,7 @@
 
 import UIKit
 
-public class KrakenImageView {
+public class KrakenImageViewController {
     private let loader: KrakenImageDataLoader
     private let url: URL?
     private var task: KrakenImageDataLoaderTask?
