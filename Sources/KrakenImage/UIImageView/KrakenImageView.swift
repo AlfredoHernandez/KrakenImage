@@ -21,6 +21,10 @@ public class KrakenImageView {
         button.isHidden = true
         return button
     }
+    
+    private(set) lazy var imageView: UIImageView = with(UIImageView()) { iv in
+        return iv
+    }
 
     init(loader: KrakenImageDataLoader, url: URL?) {
         self.loader = loader
@@ -33,8 +37,8 @@ public class KrakenImageView {
         retryIndicator?.isHidden = true
         loader.loadImageData(from: url) { [weak self] result in
             switch result {
-            case .success:
-                break
+            case let .success(imageData):
+                self?.imageView.image = UIImage(data: imageData)
             case .failure:
                 self?.retryIndicator?.isHidden = false
             }

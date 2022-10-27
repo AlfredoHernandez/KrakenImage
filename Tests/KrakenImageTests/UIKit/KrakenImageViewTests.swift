@@ -6,7 +6,7 @@
 import XCTest
 
 final class KrakenImageViewTests: XCTestCase {
-    func test_init_doesNotRequestLoadImageFromRemote() {
+    func test_init_doesNotPerformAnyURLRequest() {
         let (_, loader) = makeSUT()
 
         XCTAssertEqual(loader.loadedURLs, [])
@@ -74,7 +74,27 @@ final class KrakenImageViewTests: XCTestCase {
         sut.load()
         XCTAssertEqual(sut.retryIndicator?.isHidden, true)
     }
+    
+    func test_load_setsUIImageOnValidImageData() {
+        let (sut, loader) = makeSUT()
+        let expectedImageData = UIImage.make(withColor: .red).pngData()!
 
+        sut.load()
+
+        loader.complete(with: expectedImageData)
+        XCTAssertEqual(sut.imageView.image?.pngData(), expectedImageData)
+    }
+
+    func test_load_doesNotSetUIImageOnInvalidImageData() {
+        let (sut, loader) = makeSUT()
+        let expectedImageData = anyData()
+
+        sut.load()
+
+        loader.complete(with: expectedImageData)
+        XCTAssertNil(sut.imageView.image?.pngData())
+    }
+    
     // MARK: - Helpers
 
     private func makeSUT(url: URL? = anyURL(), file: StaticString = #file, line: UInt = #line) -> (KrakenImageView, KrakenImageDataLoaderSpy) {
