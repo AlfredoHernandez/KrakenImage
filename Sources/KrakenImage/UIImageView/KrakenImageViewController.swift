@@ -8,10 +8,10 @@ public class KrakenImageViewController {
     private let loader: KrakenImageDataLoader
     private let url: URL?
     private var task: KrakenImageDataLoaderTask?
-    private(set) var imageView = KrakenImageView(image: nil)
+    private(set) public var imageView = KrakenImageView(image: nil)
 
     /// Indicates if the image loading task is loading
-    private(set) var isLoading: Bool = false {
+    private(set) public var isLoading: Bool = false {
         willSet {
             with(imageView.loadingControl) { [newValue] in
                 newValue ? $0.startAnimating() : $0.stopAnimating()
@@ -25,7 +25,7 @@ public class KrakenImageViewController {
     }
 
     /// Start loading image task
-    func load() {
+    public func load() {
         guard let url = url else { return }
         isLoading = true
         imageView.showRetryIndicator = false
@@ -41,7 +41,7 @@ public class KrakenImageViewController {
     }
 
     /// Cancels the current loading image task
-    func cancel() {
+    public func cancel() {
         task?.cancel()
     }
 }
