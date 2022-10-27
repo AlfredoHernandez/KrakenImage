@@ -31,11 +31,11 @@ final class KrakenImageViewTests: XCTestCase {
     func test_load_displaysDefaultLoaderWhileDownloadingImage() {
         let (sut, loader) = makeSUT()
         XCTAssertFalse(sut.loadingControl.isRefreshing)
-        
+
         sut.load()
         XCTAssertTrue(sut.loadingControl.isRefreshing, "Expected to display loader while loading image")
         XCTAssertTrue(sut.isLoading, "Expected to display loader while loading image")
-        
+
         loader.complete(with: anyNSError())
         XCTAssertFalse(sut.loadingControl.isRefreshing, "Expected to not display loader after finish loading")
         XCTAssertFalse(sut.isLoading, "Expected to display loader while loading image")
@@ -47,6 +47,32 @@ final class KrakenImageViewTests: XCTestCase {
         loader.complete(with: anyData())
         XCTAssertFalse(sut.loadingControl.isRefreshing, "Expected to not display loader after finish loading")
         XCTAssertFalse(sut.isLoading, "Expected to display loader while loading image")
+    }
+
+    func test_load_displaysRetryIndicatorOnInvalidImageData() {
+        let (sut, loader) = makeSUT()
+
+        sut.load()
+        XCTAssertEqual(sut.retryIndicator?.isHidden, true)
+
+        loader.complete(with: anyNSError())
+        XCTAssertEqual(sut.retryIndicator?.isHidden, false)
+
+        sut.load()
+        XCTAssertEqual(sut.retryIndicator?.isHidden, true)
+    }
+
+    func test_load_doesNotDisplayRetryIndicatorOnValidImageData() {
+        let (sut, loader) = makeSUT()
+
+        sut.load()
+        XCTAssertEqual(sut.retryIndicator?.isHidden, true)
+
+        loader.complete(with: anyData())
+        XCTAssertEqual(sut.retryIndicator?.isHidden, true)
+
+        sut.load()
+        XCTAssertEqual(sut.retryIndicator?.isHidden, true)
     }
 
     // MARK: - Helpers

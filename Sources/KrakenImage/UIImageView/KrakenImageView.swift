@@ -12,7 +12,15 @@ public class KrakenImageView {
             newValue ? loadingControl.beginRefreshing() : loadingControl.endRefreshing()
         }
     }
-    lazy var loadingControl: UIRefreshControl = UIRefreshControl()
+
+    /// Displayed component when image is loading
+    lazy var loadingControl: UIRefreshControl = .init()
+
+    /// Component to retry download image
+    private(set) lazy var retryIndicator: UIView? = with(UIButton()) { button in
+        button.isHidden = true
+        return button
+    }
 
     init(loader: KrakenImageDataLoader, url: URL?) {
         self.loader = loader
@@ -22,7 +30,15 @@ public class KrakenImageView {
     func load() {
         guard let url = url else { return }
         isLoading = true
-        loader.loadImageData(from: url) { [weak self] _ in
+        retryIndicator?.isHidden = true
+        loader.loadImageData(from: url) { [weak self] result in
+            switch result {
+            case .success:
+                break
+            case .failure:
+                self?.retryIndicator?.isHidden = false
+            }
+
             self?.isLoading = false
         }
     }
