@@ -6,14 +6,31 @@
 import XCTest
 
 final class KrakenImageViewTests: XCTestCase {
-    func test_init_doesNotRequestsLoadImageFromRemote() {
+    func test_init_doesNotRequestLoadImageFromRemote() {
         let loader = KrakenImageDataLoaderSpy()
-        let sut = KrakenImageView(loader: loader)
-        
+        _ = KrakenImageView(loader: loader, url: anyURL())
+
         XCTAssertEqual(loader.loadedURLs, [])
     }
-}
+    
+    func test_load_doesNotRequestLoadImageFromRemoteOnInvalidURL() {
+        let loader = KrakenImageDataLoaderSpy()
+        let sut = KrakenImageView(loader: loader, url: invalidURL())
 
+        sut.load()
+
+        XCTAssertEqual(loader.loadedURLs, [])
+    }
+
+    func test_load_requestsLoadImageFromRemote() {
+        let loader = KrakenImageDataLoaderSpy()
+        let sut = KrakenImageView(loader: loader, url: anyURL())
+
+        sut.load()
+
+        XCTAssertEqual(loader.loadedURLs, [anyURL()])
+    }
+}
 
 class KrakenImageDataLoaderSpy: KrakenImageDataLoader {
     private var messages = [(url: URL, completion: (KrakenImageDataLoader.Result) -> Void)]()
@@ -35,11 +52,11 @@ class KrakenImageDataLoaderSpy: KrakenImageDataLoader {
             self?.cancelledURLs.append(url)
         }
     }
-    
+
     func complete(with error: Error, at index: Int = 0) {
         messages[index].completion(.failure(error))
     }
-    
+
     func complete(with data: Data, at index: Int = 0) {
         messages[index].completion(.success(data))
     }
