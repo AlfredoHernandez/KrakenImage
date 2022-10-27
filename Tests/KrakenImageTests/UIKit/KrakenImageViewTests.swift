@@ -7,15 +7,13 @@ import XCTest
 
 final class KrakenImageViewTests: XCTestCase {
     func test_init_doesNotRequestLoadImageFromRemote() {
-        let loader = KrakenImageDataLoaderSpy()
-        _ = KrakenImageView(loader: loader, url: anyURL())
+        let (_, loader) = makeSUT()
 
         XCTAssertEqual(loader.loadedURLs, [])
     }
-    
+
     func test_load_doesNotRequestLoadImageFromRemoteOnInvalidURL() {
-        let loader = KrakenImageDataLoaderSpy()
-        let sut = KrakenImageView(loader: loader, url: invalidURL())
+        let (sut, loader) = makeSUT(url: invalidURL())
 
         sut.load()
 
@@ -23,12 +21,23 @@ final class KrakenImageViewTests: XCTestCase {
     }
 
     func test_load_requestsLoadImageFromRemote() {
-        let loader = KrakenImageDataLoaderSpy()
-        let sut = KrakenImageView(loader: loader, url: anyURL())
+        let (sut, loader) = makeSUT()
 
         sut.load()
 
         XCTAssertEqual(loader.loadedURLs, [anyURL()])
+    }
+
+    // MARK: - Helpers
+
+    private func makeSUT(url: URL? = anyURL(), file: StaticString = #file, line: UInt = #line) -> (KrakenImageView, KrakenImageDataLoaderSpy) {
+        let loader = KrakenImageDataLoaderSpy()
+        let sut = KrakenImageView(loader: loader, url: url)
+
+        trackForMemoryLeaks(sut, file: file, line: line)
+        trackForMemoryLeaks(loader, file: file, line: line)
+
+        return (sut, loader)
     }
 }
 
