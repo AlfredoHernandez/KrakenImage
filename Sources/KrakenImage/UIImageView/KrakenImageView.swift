@@ -16,6 +16,8 @@ public class KrakenImageView: UIImageView {
         }
     }
 
+    var imageAnimated = true
+
     /// Component to retry download image
     private(set) lazy var retryIndicator: UIButton? = with(UIButton()) {
         let image = UIImage(systemName: "arrow.clockwise", withConfiguration: UIImage.SymbolConfiguration(pointSize: 30, weight: .bold))
@@ -60,10 +62,31 @@ public class KrakenImageView: UIImageView {
     }
 
     func setImage(from data: Data) {
-        image = UIImage(data: data)
+        if imageAnimated {
+            setImageAnimated(UIImage(data: data))
+        } else {
+            image = UIImage(data: data)
+        }
     }
 
     func setImage(_ image: UIImage) {
-        self.image = image
+        if imageAnimated {
+            setImageAnimated(image)
+        } else {
+            self.image = image
+        }
+    }
+}
+
+extension UIImageView {
+    func setImageAnimated(_ newImage: UIImage?) {
+        image = newImage
+
+        guard newImage != nil else { return }
+
+        alpha = 0
+        UIView.animate(withDuration: 0.25) {
+            self.alpha = 1
+        }
     }
 }

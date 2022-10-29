@@ -4,14 +4,26 @@
 
 import UIKit
 
-public class KrakenImageViewController {
+class KrakenImageViewController {
     private let loader: KrakenImageDataLoader
-    private let url: URL?
+    private(set) var url: URL?
     private var task: KrakenImageDataLoaderTask?
-    private(set) public var imageView = KrakenImageView(image: nil)
+    private(set) var imageView = KrakenImageView(image: nil)
+
+    var setUrl: URL? {
+        willSet {
+            url = newValue
+        }
+    }
+
+    var setImageAnimated = true {
+        willSet {
+            imageView.imageAnimated = newValue
+        }
+    }
 
     /// Indicates if the image loading task is loading
-    private(set) public var isLoading: Bool = false {
+    public private(set) var isLoading: Bool = false {
         willSet {
             with(imageView.loadingControl) { [newValue] in
                 newValue ? $0.startAnimating() : $0.stopAnimating()
