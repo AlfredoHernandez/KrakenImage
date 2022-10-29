@@ -2,7 +2,7 @@
 //  Copyright © 2022 Jesús Alfredo Hernández Alarcón. All rights reserved.
 //
 
-import KrakenNetwork
+@_implementationOnly import KrakenNetwork
 import UIKit
 
 public struct KrakenImageBuilder {

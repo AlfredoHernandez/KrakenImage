@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import KrakenNetwork
+@_implementationOnly import KrakenNetwork
 
 internal final class RemoteKrakenImageDataLoader: KrakenImageDataLoader {
     private let client: HTTPClient
